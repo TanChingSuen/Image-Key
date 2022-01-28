@@ -2,14 +2,10 @@ const express = require("express");
 const path = require("path");
 const app = express();
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/../client"));
 
-app.get("../src/js/test.js", function (req, res) {
-  res.sendFile(path.join(__dirname, "/test.js"));
-});
-
-app.get("../src/js/controller.js", function (req, res) {
-  res.sendFile(path.join(__dirname, "../client/src/js/controller.js"));
+app.get("/test", function (req, res) {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
 app.get("/", function (req, res) {
