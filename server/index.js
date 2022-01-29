@@ -36,15 +36,16 @@ let upload = multer({ storage: Storage }).single("image");
 
 //recieve images
 app.post("/images", function (req, res) {
-  if (req.fileValidationError) {
-    return res.send(req.fileValidationError);
-  } else if (err instanceof multer.MulterError || err) {
-    return res.send(err);
-  }
-
-  res.send(
-    '<hr/><img src="${req.file.path}" width="500"><hr /><a href="./">Upload another image</a>'
-  );
+  upload(req, res, function (err) {
+    if (req.fileValidationError) {
+      return res.send(req.fileValidationError);
+    } else if (err instanceof multer.MulterError || err) {
+      return res.send(err);
+    }
+    res.send(
+      '<hr/><img src="${req.file.path}" width="500"><hr /><a href="./">Upload another image</a>'
+    );
+  });
 });
 
 //test of the mysql connection
