@@ -1,5 +1,5 @@
-const login = document.querySelector(".nav__Login");
-const register = document.querySelector(".nav__Register");
+const login = document.querySelector(".login");
+const register = document.querySelector(".register");
 
 login.addEventListener("click", function (e) {
   e.preventDefault();
