@@ -34,6 +34,38 @@ const Storage = multer.diskStorage({
 //Set upload image
 let upload = multer({ storage: Storage }).single("image");
 
+const LoginImageStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./loginimage");
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+//Set upload image
+let loginimageupload = multer({ storage: LoginImageStorage }).single("image");
+
+const RegisterImageStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./registerimage");
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+//Set upload image
+let registerimageupload = multer({ storage: RegisterImageStorage }).single(
+  "image"
+);
+
 //recieve images
 app.post("/images", function (req, res) {
   upload(req, res, function (err) {
