@@ -67,19 +67,18 @@ let registerimageupload = multer({ storage: RegisterImageStorage }).single(
 );
 
 //recieve images
-app.post("/images", function (req, res) {
+app.post("/loginimage", function (req, res) {
   upload(req, res, function (err) {
     if (req.fileValidationError) {
       return res.send(req.fileValidationError);
     } else if (err instanceof multer.MulterError || err) {
       return res.send(err);
     }
-    res.send(
-      '<hr/><img src="${req.file.path}" width="500"><hr /><a href="./">Upload another image</a>'
-    );
+    res.send(`<hr/><img src=${req.file.path} width="500"><hr />`);
   });
 });
 
+/*
 //test of the mysql connection
 const connection = mysql.createConnection({
   host: "localhost",
@@ -98,6 +97,7 @@ connection.query(
 );
 
 connection.end();
+*/
 
 //Main website
 app.get("/", function (req, res) {
