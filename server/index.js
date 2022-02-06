@@ -1,4 +1,5 @@
 //All the require
+const fs = require("fs");
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -7,6 +8,7 @@ const multer = require("multer");
 const bodyParser = require("body-parser");
 const { rootCertificates } = require("tls");
 const fsExtra = require("fs-extra");
+const jimp = require("jimp");
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
@@ -19,25 +21,55 @@ app.get("/test", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-const notRedirect = { redirect: false };
+//set up login image router
+const loginStorage = multer.diskStorage({
+  dest: function (req, file, cb) {
+    cb(null, "./loginimage/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const loginUpload = multer({ storage: loginStorage });
 
-const loginUpload = multer({ dest: "loginimage/" });
+//set up register image router
+const registerStorage = multer.diskStorage({
+  dest: function (req, file, cb) {
+    cb(null, "./registerimage/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+const registerUpload = multer({ storage: registerStorage });
+
 app.post(
   "/loginimage",
   loginUpload.single("image--key"),
   function (req, res, next) {
     console.log(req.file);
-    fsExtra.emptyDirSync("loginimage");
+    const data = jimp.read(req.file.path, function (err, img) {
+      img.getBase64(jimp.AUTO, function (err, data) {
+        console.log(data);
+        return data;
+      });
+    });
+    fs.unlink(req.path, (err) => console.log(err));
   }
 );
 
-const registerUpload = multer({ dest: "registerimage/" });
 app.post(
   "/registerimage",
-  loginUpload.single("r--image--key"),
+  registerUpload.single("r--image--key"),
   function (req, res, next) {
     console.log(req.file);
-    fsExtra.emptyDirSync("registerimage");
+    const data = jimp.read(req.file.path, function (err, img) {
+      img.getBase64(jimp.AUTO, function (err, data) {
+        console.log(data);
+        return data;
+      });
+    });
+    fs.unlink(req.path, (err) => console.log(err));
   }
 );
 
