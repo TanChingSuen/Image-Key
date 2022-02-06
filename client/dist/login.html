@@ -11,7 +11,13 @@
   <body>
     <h1>Upload your Key Image here</h1>
     <br />
+    <iframe
+      name="prevent--redirect"
+      id="prevent--redirect"
+      style="display: none"
+    ></iframe>
     <form
+      target="prevent--redirect"
       action="loginimage"
       enctype="multipart/form-data"
       method="post"
@@ -26,7 +32,7 @@
       verify.
     </h1>
     <br />
-    <script src="src/js/controller/loginController.js"></script>
+    <script src="src/js/controller.js"></script>
     <script type="text/javascript">
       const loginKeyPort = document.querySelector(".login--key-image");
       loginKeyPort.addEventListener("change", loginKeyImage);
