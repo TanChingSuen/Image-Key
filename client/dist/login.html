@@ -12,13 +12,13 @@
     <h1>Upload your Key Image here</h1>
     <br />
     <form
-      action="/loginimage"
+      action="loginimage"
       enctype="multipart/form-data"
       method="post"
       class="login--key-image"
     >
-      <input type="file" class="image--key" accept="image/*" />
-      <input type="submit" />
+      <input type="file" name="image--key" accept="image/*" />
+      <input type="submit" class="submit--btn" />
     </form>
     <br />
     <h1>
@@ -26,7 +26,7 @@
       verify.
     </h1>
     <br />
-    <script src="src/js/controller.js"></script>
+    <script src="src/js/controller/loginController.js"></script>
     <script type="text/javascript">
       const loginKeyPort = document.querySelector(".login--key-image");
       loginKeyPort.addEventListener("change", loginKeyImage);

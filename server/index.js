@@ -6,6 +6,7 @@ const mysql = require("mysql");
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const { rootCertificates } = require("tls");
+const fsExtra = require("fs-extra");
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
@@ -18,65 +19,27 @@ app.get("/test", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-//Get a storage for those image
-const Storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
+const notRedirect = { redirect: false };
 
-//Set upload image
-let upload = multer({ storage: Storage }).single("image");
-
-const LoginImageStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./loginimage");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-//Set upload image
-let loginimageupload = multer({ storage: LoginImageStorage }).single("image");
-
-const RegisterImageStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./registerimage");
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-//Set upload image
-let registerimageupload = multer({ storage: RegisterImageStorage }).single(
-  "image"
+const loginUpload = multer({ dest: "loginimage/" });
+app.post(
+  "/loginimage",
+  loginUpload.single("image--key"),
+  function (req, res, next) {
+    console.log(req.file);
+    fsExtra.emptyDirSync("loginimage");
+  }
 );
 
-//recieve images
-app.post("/loginimage", function (req, res) {
-  upload(req, res, function (err) {
-    if (req.fileValidationError) {
-      return res.send(req.fileValidationError);
-    } else if (err instanceof multer.MulterError || err) {
-      return res.send(err);
-    }
-    res.send(`<hr/><img src=${req.file.path} width="500"><hr />`);
-  });
-});
+const registerUpload = multer({ dest: "registerimage/" });
+app.post(
+  "/registerimage",
+  loginUpload.single("r--image--key"),
+  function (req, res, next) {
+    console.log(req.file);
+    fsExtra.emptyDirSync("registerimage");
+  }
+);
 
 /*
 //test of the mysql connection
