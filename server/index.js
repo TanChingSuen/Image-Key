@@ -43,6 +43,7 @@ const registerStorage = multer.diskStorage({
 });
 const registerUpload = multer({ storage: registerStorage });
 
+//Process login key image
 app.post(
   "/loginimage",
   loginUpload.single("image--key"),
@@ -58,6 +59,7 @@ app.post(
   }
 );
 
+//Process register key image
 app.post(
   "/registerimage",
   registerUpload.single("r--image--key"),
