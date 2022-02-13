@@ -6,6 +6,9 @@
       body {
         align-items: center;
       }
+      div {
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -21,7 +24,7 @@
       action="loginimage"
       enctype="multipart/form-data"
       method="post"
-      class="login--key-image"
+      class="key-image"
     >
       <input type="file" name="image--key" accept="image/*" />
       <input type="submit" class="submit--btn" />
@@ -32,13 +35,38 @@
       verify.
     </h1>
     <br />
+    <div class="face" style="opacity: 0">
+      <video id="webcam" autoplay playsinline width="640" height="480"></video>
+      <canvas id="canvas" class="d-none"></canvas>
+      <audio id="snapSound" src="audio/snap.wav" preload="auto"></audio>
+      <button class="facePic">Take picture when you ready</button>
+    </div>
     <script src="src/js/controller.js"></script>
-    <script type="text/javascript">
-      const loginKeyPort = document.querySelector(".login--key-image");
-      loginKeyPort.addEventListener("change", loginKeyImage);
-      function loginKeyImage() {
-        console.log(1);
-      }
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"
+    ></script>
+    <script>
+      const form = document.querySelector(".key-image");
+      form.addEventListener("submit", (e) => {
+        face.style.opacity = 1;
+      });
+
+      const webcamElement = document.getElementById("webcam");
+      const canvasElement = document.getElementById("canvas");
+      const snapSoundElement = document.getElementById("snapSound");
+      const webcam = new Webcam(
+        webcamElement,
+        "user",
+        canvasElement,
+        snapSoundElement
+      );
+      webcam.start();
+      document.querySelector(".facePic").addEventListener("click", (e) => {
+        e.preventDefault();
+        webcam.snap();
+        webcam.stop();
+      });
     </script>
   </body>
 </html>
