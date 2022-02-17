@@ -9,17 +9,13 @@ const bodyParser = require("body-parser");
 const { rootCertificates } = require("tls");
 const fsExtra = require("fs-extra");
 const jimp = require("jimp");
+const { connect } = require("http2");
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
 
 //Kind of import this function
 app.use(bodyParser.json());
-
-//test localhost port
-app.get("/test", function (req, res) {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-});
 
 //set up login image router
 const loginStorage = multer.diskStorage({
@@ -49,9 +45,17 @@ app.post(
   loginUpload.single("image--key"),
   function (req, res, next) {
     console.log(req.file);
+    let id;
     const data = jimp.read(req.file.path, function (err, img) {
       img.getBase64(jimp.AUTO, function (err, data) {
-        console.log(data);
+        console.log(1);
+        /*
+      const id = connect.query(
+        `SELECT ID FROM keyImageAndFace WHERE image = ${data}`,
+        (err, res, field) => {
+          return res;
+        }
+      );*/
         return data;
       });
     });
