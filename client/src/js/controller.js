@@ -6,9 +6,7 @@ const face = document.querySelector(".face");
 if (homepage) {
   homepage.addEventListener("click", function (e) {
     e.preventDefault();
-    console.log(1);
     window.location.assign("http://localhost:3000");
-    console.log(2);
   });
 }
 

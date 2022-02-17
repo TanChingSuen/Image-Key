@@ -11,8 +11,8 @@
       }
       nav {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        align-content: center;
+        justify-content: center;
         height: 6rem;
         width: 50%;
         padding: 0 6rem;
@@ -50,13 +50,7 @@
       After finished processing your image, we will take a picture of you to
       verify.
     </h1>
-    <br />
-    <div class="face" style="opacity: 0">
-      <video id="webcam" autoplay playsinline width="640" height="480"></video>
-      <canvas id="canvas" class="d-none"></canvas>
-      <audio id="snapSound" src="audio/snap.wav" preload="auto"></audio>
-      <button class="facePic">Take picture when you ready</button>
-    </div>
+    <br class="br" />
     <script src="src/js/controller.js"></script>
     <script
       type="text/javascript"
@@ -65,23 +59,31 @@
     <script>
       const form = document.querySelector(".key-image");
       form.addEventListener("submit", (e) => {
-        face.style.opacity = 1;
-      });
-
-      const webcamElement = document.getElementById("webcam");
-      const canvasElement = document.getElementById("canvas");
-      const snapSoundElement = document.getElementById("snapSound");
-      const webcam = new Webcam(
-        webcamElement,
-        "user",
-        canvasElement,
-        snapSoundElement
-      );
-      webcam.start();
-      document.querySelector(".facePic").addEventListener("click", (e) => {
-        e.preventDefault();
-        webcam.snap();
-        webcam.stop();
+        const br = document.querySelector(".br");
+        br.insertAdjacentHTML(
+          "afterend",
+          `<div class="face">
+            <video id="webcam" autoplay playsinline width="640" height="480"></video>
+            <canvas id="canvas" class="d-none"></canvas>
+            <audio id="snapSound" src="audio/snap.wav" preload="auto"></audio>
+            <button class="facePic">Take picture when you ready</button>
+          </div>`
+        );
+        const webcamElement = document.getElementById("webcam");
+        const canvasElement = document.getElementById("canvas");
+        const snapSoundElement = document.getElementById("snapSound");
+        const webcam = new Webcam(
+          webcamElement,
+          "user",
+          canvasElement,
+          snapSoundElement
+        );
+        webcam.start();
+        document.querySelector(".facePic").addEventListener("click", (e) => {
+          e.preventDefault();
+          webcam.snap();
+          webcam.stop();
+        });
       });
     </script>
   </body>
