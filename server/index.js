@@ -10,6 +10,9 @@ const { rootCertificates } = require("tls");
 const fsExtra = require("fs-extra");
 const jimp = require("jimp");
 const { connect } = require("http2");
+const b = require("based-blob");
+global.atob = require("atob");
+global.Blob = require("node-blob");
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
@@ -40,44 +43,60 @@ const registerStorage = multer.diskStorage({
 const registerUpload = multer({ storage: registerStorage });
 
 //Process login key image
-app.post(
-  "/loginimage",
-  loginUpload.single("image--key"),
-  function (req, res, next) {
-    console.log(req.file);
+
+app
+  .route("/loginimage")
+  .post(loginUpload.single("image--key"), function (req, res, next) {
     let id;
-    const data = jimp.read(req.file.path, function (err, img) {
-      img.getBase64(jimp.AUTO, function (err, data) {
-        console.log(1);
-        /*
-      const id = connect.query(
-        `SELECT ID FROM keyImageAndFace WHERE image = ${data}`,
-        (err, res, field) => {
-          return res;
-        }
-      );*/
-        return data;
-      });
-    });
-    fs.unlink(req.path, (err) => console.log(err));
-  }
-);
+    const data = fs.readFileSync(req.file.path, "base64");
+
+    const connection = mysqlConn();
+    connection.connect();
+    connection.query(
+      `SELECT ID from keyimageandface WHERE keyImage = '${blob}'`,
+      function (err, res) {
+        console.log(1, res);
+      }
+    );
+    connection.query(
+      `SELECT * from keyimageandface WHERE ID = 1`,
+      function (err, res) {
+        console.log(2, res);
+      }
+    );
+    connection.end();
+    app.locals.loginFindSame = 1;
+    next();
+  })
+  .get(function (req, res) {
+    setTimeout(() => {
+      res.json({ findSame: app.locals.loginFindSame });
+    }, 5000);
+  });
 
 //Process register key image
-app.post(
-  "/registerimage",
-  registerUpload.single("r--image--key"),
-  function (req, res, next) {
+app
+  .route("/registerimage")
+  .post(registerUpload.single("r--image--key"), function (req, res, next) {
     console.log(req.file);
-    const data = jimp.read(req.file.path, function (err, img) {
-      img.getBase64(jimp.AUTO, function (err, data) {
-        console.log(data);
-        return data;
-      });
-    });
-    fs.unlink(req.path, (err) => console.log(err));
-  }
-);
+    const data = fs.readFileSync(req.file.path, "base64");
+    app.locals.regFindSame = 1;
+  })
+  .get(function (req, res) {
+    setTimeout(() => {
+      res.json({ findSame: app.locals.regFindSame });
+    }, 5000);
+  });
+
+function mysqlConn() {
+  const connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: null,
+    database: "test",
+  });
+  return connection;
+}
 
 /*
 //test of the mysql connection

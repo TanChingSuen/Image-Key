@@ -57,33 +57,36 @@
       src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"
     ></script>
     <script>
-      const form = document.querySelector(".key-image");
-      form.addEventListener("submit", (e) => {
+      function takeFacePic() {
         const br = document.querySelector(".br");
         br.insertAdjacentHTML(
           "afterend",
           `<div class="face">
             <video id="webcam" autoplay playsinline width="640" height="480"></video>
             <canvas id="canvas" class="d-none"></canvas>
-            <audio id="snapSound" src="audio/snap.wav" preload="auto"></audio>
             <button class="facePic">Take picture when you ready</button>
           </div>`
         );
         const webcamElement = document.getElementById("webcam");
         const canvasElement = document.getElementById("canvas");
-        const snapSoundElement = document.getElementById("snapSound");
-        const webcam = new Webcam(
-          webcamElement,
-          "user",
-          canvasElement,
-          snapSoundElement
-        );
+        const webcam = new Webcam(webcamElement, "user", canvasElement, null);
         webcam.start();
         document.querySelector(".facePic").addEventListener("click", (e) => {
           e.preventDefault();
-          webcam.snap();
+          const face = webcam.snap();
           webcam.stop();
+          webcamElement.remove();
         });
+      }
+      const form = document.querySelector(".key-image");
+      form.addEventListener("submit", (e) => {
+        fetch("http://localhost:3000/loginimage", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((res) => res.json())
+          .then((data) => console.log(data.findSame));
+        takeFacePic();
       });
     </script>
   </body>
