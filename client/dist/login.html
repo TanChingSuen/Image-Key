@@ -60,7 +60,7 @@
       function takeFacePic() {
         const br = document.querySelector(".br");
         br.insertAdjacentHTML(
-          "afterend",
+          "afterend", //w640 h480
           `<div class="face">
             <video id="webcam" autoplay playsinline width="640" height="480"></video>
             <canvas id="canvas" class="d-none"></canvas>
@@ -69,24 +69,42 @@
         );
         const webcamElement = document.getElementById("webcam");
         const canvasElement = document.getElementById("canvas");
+        const faceBtn = document.querySelector(".facePic");
         const webcam = new Webcam(webcamElement, "user", canvasElement, null);
         webcam.start();
-        document.querySelector(".facePic").addEventListener("click", (e) => {
+        faceBtn.addEventListener("click", (e) => {
           e.preventDefault();
           const face = webcam.snap();
           webcam.stop();
           webcamElement.remove();
+          faceBtn.remove();
+          const formdata = new FormData();
+          formdata.append("loginface", face);
+          fetch("http://localhost:3000/loginface", {
+            method: "POST",
+            body: formdata,
+          });
         });
       }
       const form = document.querySelector(".key-image");
       form.addEventListener("submit", (e) => {
+        let loginID;
         fetch("http://localhost:3000/loginimage", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })
           .then((res) => res.json())
-          .then((data) => console.log(data.findSame));
-        takeFacePic();
+          .then((data) => {
+            loginID = data.ID;
+            if (loginID) {
+              console.log(loginID);
+              takeFacePic();
+            } else {
+              alert(
+                "This picture is not found, please submit the correct image."
+              );
+            }
+          });
       });
     </script>
   </body>
