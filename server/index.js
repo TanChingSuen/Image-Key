@@ -16,7 +16,6 @@ global.Blob = require("node-blob");
 const EventEmitter = require("events");
 const eventemitter = new EventEmitter();
 const faceapi = require("face-api.js");
-const BSON = require("bson");
 const mime = require("mime");
 const canvas = require("canvas");
 const tf = require("@tensorflow/tfjs-node");
