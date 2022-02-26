@@ -18,6 +18,8 @@ const eventemitter = new EventEmitter();
 const faceapi = require("face-api.js");
 const canvas = require("canvas");
 const tf = require("@tensorflow/tfjs-node");
+const { Canvas, Image, ImageData } = canvas;
+faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
@@ -111,15 +113,46 @@ app
     const connection = mysqlConn();
     connection.connect();
     let newID;
-    connection.query(`SELECT MAX(ID) FROM keyimageandface`, (err, res) => {
-      if (err) throw err;
-      if (res) {
-        newID = res + 1;
+    connection.query(
+      `SELECT MAX(ID) AS nextIDbase FROM keyimageandface`,
+      (err, res) => {
+        if (err) throw err;
+        if (res) {
+          newID = res[0].nextIDbase + 1;
+          eventemitter.emit("findSame");
+        }
       }
-      console.log(newID);
-      eventemitter.emit("regImage");
+    );
+
+    eventemitter.on("findSame", () => {
+      connection.query(
+        `INSERT INTO keyimageandface (ID , keyImage) VALUES (${newID} , '${data}')`
+      );
+      connection.query(
+        `SELECT ID FROM keyimageandface WHERE ID != ${newID} and keyImage = (SELECT keyImage FROM keyimageandface WHERE ID = ${newID})`,
+        (err, res) => {
+          if (err) throw err;
+          if (res[0]?.ID) {
+            app.locals.regID = null;
+            eventemitter.emit("findtrue");
+            eventemitter.emit("regImage");
+          } else {
+            app.locals.regID = newID;
+            eventemitter.emit("regImage");
+            eventemitter.emit("endConn");
+          }
+        }
+      );
     });
-    connection.end();
+
+    eventemitter.on("endConn", () => {
+      connection.end();
+    });
+
+    eventemitter.on("findtrue", () => {
+      connection.query(`DELETE FROM keyimageandface WHERE ID = ${newID}`);
+      eventemitter.emit("endConn");
+    });
   })
   .get(function (req, res) {
     eventemitter.on("regImage", () => {
@@ -157,22 +190,60 @@ app
       jimp.read(dbfacebuf, (err, res) => {
         if (err) throw err;
         res.quality(100).write("temp/dbface.png");
-        eventemitter.emit("emptyTemp");
+        const model_path = path.join(__dirname, "../models");
+
+        faceRec().catch((err) => console.log(err));
+
+        async function faceRec() {
+          console.log(1);
+          await faceapi.nets.faceRecognitionNet.loadFromDisk(model_path);
+          console.log(2);
+          await faceapi.nets.faceLandmark68Net.loadFromDisk(model_path);
+          console.log(3);
+          await faceapi.nets.ssdMobilenetv1.loadFromDisk(model_path);
+          console.log(4);
+          const dbface = await canvas.loadImage(
+            path.join(__dirname, "../temp/dbface.png")
+          );
+          console.log(5);
+          const facePic = await canvas.loadImage(
+            path.join(__dirname, "../temp/facePic.png")
+          );
+          console.log("Image Completed");
+          const dbfaceRes = await faceapi
+            .detectSingleFace(dbface)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+          const faceMatcher = new faceapi.FaceMatcher(dbfaceRes);
+          const facePicRes = await faceapi
+            .detectSingleFace(facePic)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+          const bestMatch = faceMatcher.findBestMatch(facePicRes.descriptor);
+          console.log(bestMatch.toString());
+          eventemitter.emit("emptyTemp");
+        }
       });
     });
   });
 
 eventemitter.on("emptyTemp", () => {
-  fsExtra.emptyDirSync("./temp");
+  fsExtra.emptydirSync(path.join(__dirname, "../temp"));
 });
 
 //Process register face picture
 app
   .route("/registerface")
-  .post(
-    registerFaceUpload.single("register--face"),
-    function (req, res, next) {}
-  );
+  .post(registerFaceUpload.single("register--face"), function (req, res, next) {
+    const storingData = req.body.registerface.split(",")[1];
+    const connection = mysqlConn();
+    connection.connect();
+    connection.query(
+      `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
+    );
+    connection.end();
+    res.json(1);
+  });
 
 function mysqlConn() {
   const connection = mysql.createConnection({
