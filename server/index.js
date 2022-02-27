@@ -15,7 +15,7 @@ global.atob = require("atob");
 global.Blob = require("node-blob");
 const EventEmitter = require("events");
 const eventemitter = new EventEmitter();
-const faceapi = require("face-api.js");
+const faceapi = require("@vladmandic/face-api");
 const canvas = require("canvas");
 const tf = require("@tensorflow/tfjs-node");
 const { Canvas, Image, ImageData } = canvas;
@@ -211,16 +211,22 @@ app
           );
           console.log("Image Completed");
           const dbfaceRes = await faceapi
-            .detectSingleFace(dbface)
+            .detectSingleFace(dbface, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
+          console.log(6);
           const faceMatcher = new faceapi.FaceMatcher(dbfaceRes);
+          console.log(7);
           const facePicRes = await faceapi
-            .detectSingleFace(facePic)
+            .detectSingleFace(facePic, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
-          const bestMatch = faceMatcher.findBestMatch(facePicRes.descriptor);
-          console.log(bestMatch.toString());
+          console.log(8);
+          if (facePicRes) {
+            const bestMatch = faceMatcher.findBestMatch(facePicRes.descriptor);
+            console.log(bestMatch.toString());
+          }
+
           eventemitter.emit("emptyTemp");
         }
       });
@@ -236,13 +242,46 @@ app
   .route("/registerface")
   .post(registerFaceUpload.single("register--face"), function (req, res, next) {
     const storingData = req.body.registerface.split(",")[1];
-    const connection = mysqlConn();
-    connection.connect();
-    connection.query(
-      `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
-    );
-    connection.end();
-    res.json(1);
+    const model_path = path.join(__dirname, "../models");
+    let a = null;
+    const face = Buffer.from(storingData, "base64");
+    jimp.read(face, (err, res) => {
+      if (err) throw err;
+      res.quality(100).write("temp/facePic.png");
+
+      faceRec().catch((err) => console.log(err));
+
+      async function faceRec() {
+        console.log(1);
+        await faceapi.nets.faceRecognitionNet.loadFromDisk(model_path);
+        console.log(2);
+        await faceapi.nets.faceLandmark68Net.loadFromDisk(model_path);
+        console.log(3);
+        await faceapi.nets.ssdMobilenetv1.loadFromDisk(model_path);
+        console.log(4);
+        const facePic = await canvas.loadImage(
+          path.join(__dirname, "../temp/facePic.png")
+        );
+        const facePicRes = await faceapi
+          .detectSingleFace(facePic, new faceapi.SsdMobilenetv1Options())
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+        if (facePicRes) {
+          const connection = mysqlConn();
+          connection.connect();
+          connection.query(
+            `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
+          );
+          connection.end();
+          a = 1;
+        }
+      }
+      eventemitter.emit("regFace", a);
+    });
+    eventemitter.on("regFace", (tof) => {
+      eventemitter.emit("emptyTemp");
+      res.json(tof);
+    });
   });
 
 function mysqlConn() {

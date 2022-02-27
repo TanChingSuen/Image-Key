@@ -1,16 +1,11 @@
 {
   "name": "imagekey",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "dependencies": {
-    "@tensorflow/tfjs-backend-cpu": "^3.13.0",
-    "@tensorflow/tfjs-backend-webgl": "^3.13.0",
-    "@tensorflow/tfjs-converter": "^3.13.0",
-    "@tensorflow/tfjs-core": "^2.8.6",
-    "@tensorflow/tfjs-data": "^3.13.0",
-    "@tensorflow/tfjs-layers": "^3.13.0",
+    "@tensorflow/tfjs-core": "^3.13.0",
     "@tensorflow/tfjs-node": "^3.13.0",
+    "@vladmandic/face-api": "^1.6.5",
     "async": "^3.2.3",
     "atob": "^2.1.2",
     "based-blob": "^1.0.1",
@@ -39,5 +34,6 @@
   "bugs": {
     "url": "https://github.com/TanChingSuen/Image-Key/issues"
   },
-  "homepage": "https://github.com/TanChingSuen/Image-Key#readme"
+  "homepage": "https://github.com/TanChingSuen/Image-Key#readme",
+  "description": ""
 }
