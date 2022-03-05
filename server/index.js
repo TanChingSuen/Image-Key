@@ -195,6 +195,7 @@ app
         faceRec().catch((err) => console.log(err));
 
         async function faceRec() {
+          let a;
           console.log(1);
           await faceapi.nets.faceRecognitionNet.loadFromDisk(model_path);
           console.log(2);
@@ -211,25 +212,37 @@ app
           );
           console.log("Image Completed");
           const dbfaceRes = await faceapi
-            .detectSingleFace(dbface, new faceapi.SsdMobilenetv1Options())
+            .detectAllFaces(dbface, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
-            .withFaceDescriptor();
+            .withFaceDescriptors();
           console.log(6);
-          const faceMatcher = new faceapi.FaceMatcher(dbfaceRes);
+          const faceMatcher = new faceapi.FaceMatcher(dbfaceRes[0]);
           console.log(7);
           const facePicRes = await faceapi
-            .detectSingleFace(facePic, new faceapi.SsdMobilenetv1Options())
+            .detectAllFaces(facePic, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
-            .withFaceDescriptor();
+            .withFaceDescriptors();
           console.log(8);
           if (facePicRes) {
-            const bestMatch = faceMatcher.findBestMatch(facePicRes.descriptor);
+            const bestMatch = faceMatcher.findBestMatch(
+              facePicRes[0].descriptor
+            );
             console.log(bestMatch.toString());
+            if (bestMatch.distance < 0.5) {
+              a = 1;
+              eventemitter.emit("logFace", a);
+            } else {
+              a = null;
+              eventemitter.emit("logFace", a);
+            }
           }
 
           eventemitter.emit("emptyTemp");
         }
       });
+    });
+    eventemitter.on("logFace", (tof) => {
+      res.json(tof);
     });
   });
 
@@ -262,23 +275,30 @@ app
         const facePic = await canvas.loadImage(
           path.join(__dirname, "../temp/facePic.png")
         );
+        console.log(5);
         const facePicRes = await faceapi
-          .detectSingleFace(facePic, new faceapi.SsdMobilenetv1Options())
+          .detectAllFaces(facePic, new faceapi.SsdMobilenetv1Options())
           .withFaceLandmarks()
-          .withFaceDescriptor();
-        if (facePicRes) {
-          const connection = mysqlConn();
-          connection.connect();
-          connection.query(
-            `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
-          );
-          connection.end();
-          a = 1;
-        }
+          .withFaceDescriptors();
+        console.log(6);
+        eventemitter.on("checkRegFace", () => {
+          console.log(7);
+          if (facePicRes[0]) {
+            const connection = mysqlConn();
+            connection.connect();
+            connection.query(
+              `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
+            );
+            connection.end();
+            a = 1;
+          }
+          eventemitter.emit("regFace", a);
+        });
+        eventemitter.emit("checkRegFace");
       }
-      eventemitter.emit("regFace", a);
     });
     eventemitter.on("regFace", (tof) => {
+      console.log(8);
       eventemitter.emit("emptyTemp");
       res.json(tof);
     });
@@ -294,9 +314,13 @@ function mysqlConn() {
   return connection;
 }
 
+app.get("/user", function (req, res) {
+  res.sendFile(path.join(__dirname, "../client/dist/user.html"));
+});
+
 //Main website
 app.get("/", function (req, res) {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  res.sendFile(path.join(__dirname, "../client/dist/homepage.html"));
 });
 
 //Login page

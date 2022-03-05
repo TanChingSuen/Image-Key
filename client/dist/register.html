@@ -91,7 +91,15 @@
           })
             .then((res) => res.json())
             .then((data) => {
-              console.log(data);
+              if (data) {
+                console.log("Register Success");
+              } else {
+                canvasElement.remove();
+                alert(
+                  "We are not able to detect your face from the picture you just took.\nPlease take another picture"
+                );
+                takeFacePic();
+              }
             });
         });
       }
@@ -104,9 +112,7 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log(data);
             regID = data;
-            console.log(regID);
             if (regID) {
               takeFacePic();
             } else {

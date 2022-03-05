@@ -83,7 +83,19 @@
           fetch("http://localhost:3000/loginface", {
             method: "POST",
             body: formdata,
-          });
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data) {
+                console.log("Login Success");
+              } else {
+                canvasElement.remove();
+                alert(
+                  "We are not able to match your face from the picture you just took with the picture in our database.\nPlease take another picture"
+                );
+                takeFacePic();
+              }
+            });
         });
       }
       const form = document.querySelector(".key-image");
@@ -97,7 +109,6 @@
           .then((data) => {
             loginID = data.ID;
             if (loginID) {
-              console.log(loginID);
               takeFacePic();
             } else {
               alert(
