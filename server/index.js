@@ -23,6 +23,7 @@ faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
+app.use(express.static(__dirname + "../node_modules"));
 
 //Kind of import this function
 app.use(bodyParser.json());
@@ -196,34 +197,31 @@ app
 
         async function faceRec() {
           let a;
-          console.log(1);
           await faceapi.nets.faceRecognitionNet.loadFromDisk(model_path);
-          console.log(2);
           await faceapi.nets.faceLandmark68Net.loadFromDisk(model_path);
-          console.log(3);
           await faceapi.nets.ssdMobilenetv1.loadFromDisk(model_path);
-          console.log(4);
           const dbface = await canvas.loadImage(
             path.join(__dirname, "../temp/dbface.png")
           );
-          console.log(5);
           const facePic = await canvas.loadImage(
             path.join(__dirname, "../temp/facePic.png")
           );
-          console.log("Image Completed");
           const dbfaceRes = await faceapi
             .detectAllFaces(dbface, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptors();
-          console.log(6);
           const faceMatcher = new faceapi.FaceMatcher(dbfaceRes[0]);
-          console.log(7);
           const facePicRes = await faceapi
             .detectAllFaces(facePic, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptors();
-          console.log(8);
           if (facePicRes) {
+            if (!facePicRes[0]) {
+              eventemitter.emit("logFace", 200);
+              eventemitter.emit("emptyTemp");
+              //connection.end();
+              return;
+            }
             const bestMatch = faceMatcher.findBestMatch(
               facePicRes[0].descriptor
             );
@@ -231,8 +229,11 @@ app
             if (bestMatch.distance < 0.5) {
               a = 1;
               eventemitter.emit("logFace", a);
+              app.locals._ID = app.locals.loginID;
+              //connection.end();
             } else {
               a = null;
+              //connection.end();
               eventemitter.emit("logFace", a);
             }
           }
@@ -265,24 +266,17 @@ app
       faceRec().catch((err) => console.log(err));
 
       async function faceRec() {
-        console.log(1);
         await faceapi.nets.faceRecognitionNet.loadFromDisk(model_path);
-        console.log(2);
         await faceapi.nets.faceLandmark68Net.loadFromDisk(model_path);
-        console.log(3);
         await faceapi.nets.ssdMobilenetv1.loadFromDisk(model_path);
-        console.log(4);
         const facePic = await canvas.loadImage(
           path.join(__dirname, "../temp/facePic.png")
         );
-        console.log(5);
         const facePicRes = await faceapi
           .detectAllFaces(facePic, new faceapi.SsdMobilenetv1Options())
           .withFaceLandmarks()
           .withFaceDescriptors();
-        console.log(6);
         eventemitter.on("checkRegFace", () => {
-          console.log(7);
           if (facePicRes[0]) {
             const connection = mysqlConn();
             connection.connect();
@@ -291,6 +285,7 @@ app
             );
             connection.end();
             a = 1;
+            app.locals._ID = app.locals.regID;
           }
           eventemitter.emit("regFace", a);
         });
@@ -298,7 +293,6 @@ app
       }
     });
     eventemitter.on("regFace", (tof) => {
-      console.log(8);
       eventemitter.emit("emptyTemp");
       res.json(tof);
     });
@@ -314,11 +308,52 @@ function mysqlConn() {
   return connection;
 }
 
+//Send the EVERYTHING in use
+app.get("/_id", (req, res) => {
+  let data;
+  const connection = mysqlConn();
+  connection.connect();
+  connection.query(
+    `SELECT Title,password,url FROM passwordtable WHERE ID = ${app.locals._ID.ID}`,
+    (err, res) => {
+      if (err) throw err;
+      data = res;
+      eventemitter.emit("sendData");
+    }
+  );
+
+  eventemitter.on("sendData", () => {
+    res.json([app.locals._ID, data]);
+  });
+});
+
+app.post("/add", (req, res) => {
+  const connection = mysqlConn();
+  connection.connect();
+  connection.query(
+    `INSERT INTO passwordtable (ID, Title, password, url) VALUES (${req.body.ID} , '${req.body.Title}' , '${req.body.password}' , '${req.body.url}')`
+  );
+  connection.end();
+  res.json(1);
+});
+
+app.post("/delete", (req, res) => {
+  console.log(req.body);
+  const connection = mysqlConn();
+  connection.connect();
+  connection.query(
+    `DELETE FROM passwordtable WHERE ID = ${req.body.ID} AND Title = '${req.body.Title}' AND password = '${req.body.password}' AND url = '${req.body.url}'`
+  );
+  connection.end();
+  res.json(1);
+});
+
+//Password Page
 app.get("/user", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/user.html"));
 });
 
-//Main website
+//Homepage
 app.get("/", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/homepage.html"));
 });

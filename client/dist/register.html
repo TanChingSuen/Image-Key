@@ -6,9 +6,6 @@
       body {
         align-items: center;
       }
-      div {
-        opacity: 1;
-      }
       nav {
         display: flex;
         align-content: center;
@@ -92,7 +89,8 @@
             .then((res) => res.json())
             .then((data) => {
               if (data) {
-                console.log("Register Success");
+                alert("Register Success");
+                window.location.assign("http://localhost:3000/user");
               } else {
                 canvasElement.remove();
                 alert(

@@ -1,1 +1,57 @@
 <!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Key Password</title>
+    <style>
+      body {
+        align-items: center;
+      }
+      table,
+      tr,
+      td,
+      th {
+        border: 1px solid black;
+      }
+      div {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        background-color: aqua;
+        padding: 3rem;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Click the plus button to add Password</h1>
+    <button class="add">+</button>
+    <br />
+    <br />
+    <table class="pwTable">
+      <tr>
+        <th>Title</th>
+        <th>Password</th>
+      </tr>
+    </table>
+    <div class="addModal">
+      <button class="closeAddBtn">x</button>
+      <h2>Add the password you want to store</h2>
+      <label>Title</label>
+      <input type="text" class="input--title" /><br />
+      <label>Password</label>
+      <input type="text" class="input--password" /><br />
+      <label>URL (Optional, not required)</label>
+      <input type="text" class="input--url" /><br />
+      <h4>
+        Press the Random Password Generator Button to, Well, do what the button
+        stated
+      </h4>
+      <h4>Press the Submit Button When you finish</h4>
+      <button class="btn--randompw">Random Password Generator</button>
+      <button class="btn--submit">submit</button>
+    </div>
+    <script src="src/js/controller.js"></script>
+  </body>
+</html>
