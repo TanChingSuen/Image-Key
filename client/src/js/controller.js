@@ -109,7 +109,7 @@ if (addbtn) {
       const title = document.querySelector(".input--title").value;
       const pw = document.querySelector(".input--password").value;
       const uurl = document.querySelector(".input--url").value;
-      const pwitem = { ID: iid, Title: title, password: pw, url: uurl };
+      const pwitem = { iID: iid, Title: title, password: pw, url: uurl };
       fetch("http://localhost:3000/add", {
         headers: {
           "Content-Type": "application/json",

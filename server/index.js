@@ -76,7 +76,9 @@ const registerFaceUpload = multer({ storage: registerFaceStorage });
 app
   .route("/loginimage")
   .post(loginUpload.single("image--key"), function (req, res, next) {
+    console.log(1);
     let id;
+    app.locals.loginID = false;
     const data = fs.readFileSync(req.file.path, "base64");
     const connection = mysqlConn();
     connection.connect();
@@ -89,7 +91,7 @@ app
       `SELECT ID FROM keyimageandface WHERE ID != 2147483646 and keyImage = (SELECT keyImage FROM keyimageandface WHERE ID = 2147483646)`,
       (err, res) => {
         if (err) throw err;
-        app.locals.loginID = res[0];
+        app.locals.loginID = res[0] ? res[0] : 0;
         eventemitter.emit("loginImage");
       }
     );
@@ -100,7 +102,7 @@ app
     next();
   })
   .get(function (req, res) {
-    eventemitter.on("loginImage", () => {
+    eventemitter.once("loginImage", () => {
       res.json(app.locals.loginID);
     });
   });
@@ -109,7 +111,6 @@ app
 app
   .route("/registerimage")
   .post(registerUpload.single("r--image--key"), function (req, res, next) {
-    console.log(req.file);
     const data = fs.readFileSync(req.file.path, "base64");
     const connection = mysqlConn();
     connection.connect();
@@ -125,7 +126,7 @@ app
       }
     );
 
-    eventemitter.on("findSame", () => {
+    eventemitter.once("findSame", () => {
       connection.query(
         `INSERT INTO keyimageandface (ID , keyImage) VALUES (${newID} , '${data}')`
       );
@@ -146,17 +147,17 @@ app
       );
     });
 
-    eventemitter.on("endConn", () => {
+    eventemitter.once("endConn", () => {
       connection.end();
     });
 
-    eventemitter.on("findtrue", () => {
+    eventemitter.once("findtrue", () => {
       connection.query(`DELETE FROM keyimageandface WHERE ID = ${newID}`);
       eventemitter.emit("endConn");
     });
   })
   .get(function (req, res) {
-    eventemitter.on("regImage", () => {
+    eventemitter.once("regImage", () => {
       res.json(app.locals.regID);
     });
   });
@@ -332,7 +333,7 @@ app.post("/add", (req, res) => {
   const connection = mysqlConn();
   connection.connect();
   connection.query(
-    `INSERT INTO passwordtable (ID, Title, password, url) VALUES (${req.body.ID} , '${req.body.Title}' , '${req.body.password}' , '${req.body.url}')`
+    `INSERT INTO passwordtable (ID, Title, password, url) VALUES (${req.body.iID} , '${req.body.Title}' , '${req.body.password}' , '${req.body.url}')`
   );
   connection.end();
   res.json(1);
