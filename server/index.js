@@ -172,18 +172,20 @@ app
       res.quality(100).write("temp/facePic.png");
     });
     let dbface;
+    let temp;
     const connection = mysqlConn();
     connection.connect();
     connection.query(
       `SELECT faceImage FROM keyimageandface WHERE ID = ${app.locals.loginID.ID}`,
       (err, res) => {
         if (err) throw err;
-        dbface = res;
+        temp = res;
         eventemitter.emit("loginface");
       }
     );
     connection.end();
-    eventemitter.on("loginface", () => {
+    eventemitter.once("loginface", () => {
+      dbface = temp;
       dbface = JSON.stringify(dbface[0].faceImage);
       const buf = Buffer.from(JSON.parse(dbface).data);
       const dbface64 = buf.toString();
@@ -225,7 +227,6 @@ app
             const bestMatch = faceMatcher.findBestMatch(
               facePicRes[0].descriptor
             );
-            console.log(bestMatch.toString());
             if (bestMatch.distance < 0.5) {
               a = 1;
               eventemitter.emit("logFace", a);
@@ -242,7 +243,7 @@ app
         }
       });
     });
-    eventemitter.on("logFace", (tof) => {
+    eventemitter.once("logFace", (tof) => {
       res.json(tof);
     });
   });
@@ -276,7 +277,7 @@ app
           .detectAllFaces(facePic, new faceapi.SsdMobilenetv1Options())
           .withFaceLandmarks()
           .withFaceDescriptors();
-        eventemitter.on("checkRegFace", () => {
+        eventemitter.once("checkRegFace", () => {
           if (facePicRes[0]) {
             const connection = mysqlConn();
             connection.connect();
@@ -292,7 +293,7 @@ app
         eventemitter.emit("checkRegFace");
       }
     });
-    eventemitter.on("regFace", (tof) => {
+    eventemitter.once("regFace", (tof) => {
       eventemitter.emit("emptyTemp");
       res.json(tof);
     });

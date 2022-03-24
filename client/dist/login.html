@@ -94,6 +94,8 @@
                 window.location.assign("http://localhost:3000/user");
               } else {
                 canvasElement.remove();
+                localStorage.clear();
+                console.log(1);
                 alert(
                   "We are not able to match your face from the picture you just took with the picture in our database.\nPlease take another picture"
                 );
