@@ -40,14 +40,14 @@ if (addbtn) {
         const row = pwTable.insertRow(-1);
         const c1 = row.insertCell(0);
         const c2 = row.insertCell(1);
-        const httpsPre = "http://";
+        const httpsPre = "https://";
         let ehref;
-        if (!e.url?.search("https://")) {
+        if (!e.url?.includes("https://")) {
           ehref = `href="${httpsPre + e.url}"`;
         } else {
           ehref = e.url;
         }
-        c1.innerHTML = `<a ${e.url ? ehref : null} >${e.Title}</a>`;
+        c1.innerHTML = `<a ${e.url ? ehref : ""} >${e.Title}</a>`;
         c2.innerHTML = `<button class='copy${i}' >Copy to Clipboard</button>
         <button class='delete${i}' >Detele</button>`;
         document
@@ -96,6 +96,12 @@ if (addbtn) {
       e.preventDefault();
       document.querySelector(".addModal").style.opacity = 0;
     });
+    const randompw = document.querySelector(".btn--randompw");
+    randompw.addEventListener("click", (e) => {
+      e.preventDefault();
+      const pw = document.querySelector(".input--password");
+      pw.value = randomPassword();
+    });
     //Start over here
     const subtn = document.querySelector(".btn--submit");
     subtn.addEventListener("click", (e) => {
@@ -118,12 +124,12 @@ if (addbtn) {
           const row = pwTable.insertRow(-1);
           const c1 = row.insertCell(0);
           const c2 = row.insertCell(1);
-          const httpsPre = "http://";
+          const httpsPre = "https://";
           let ehref;
-          if (!pwitem.url?.search("https://")) {
+          if (!pwitem.url?.includes("https://")) {
             ehref = `href="${httpsPre + pwitem.url}"`;
           } else {
-            ehref = pwitem.url;
+            ehref = `herf="${pwitem.url}"`;
           }
           c1.innerHTML = `<a ${pwitem.url ? ehref : null} >${pwitem.Title}</a>`;
           c2.innerHTML = `<button class='copy${pt}' >Copy to Clipboard</button>
@@ -149,9 +155,14 @@ if (addbtn) {
   });
 }
 
-/*
-Array(2)
-0: {ID: 2}
-1: Array(1)
-  0: {Title: 'Gmail', password: '12346a', url: ''}
-*/
+function randomPassword() {
+  const chars =
+    "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const length = 25;
+  let out = "";
+  for (let i = 0; i <= length; i++) {
+    const index = Math.floor(Math.random() * chars.length);
+    out += chars[index];
+  }
+  return out;
+}
