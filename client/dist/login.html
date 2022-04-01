@@ -77,7 +77,7 @@
           faceBtn.remove();
           const formdata = new FormData();
           formdata.append("loginface", face);
-          fetch("http://localhost:3000/loginface", {
+          fetch("/loginface", {
             method: "POST",
             body: formdata,
           })
@@ -91,7 +91,7 @@
                 takeFacePic();
               } else if (data) {
                 alert("Login Success");
-                window.location.assign("http://localhost:3000/user");
+                window.location.assign("/user");
               } else {
                 canvasElement.remove();
                 localStorage.clear();
@@ -107,7 +107,7 @@
       const form = document.querySelector(".key-image");
       form.addEventListener("submit", (e) => {
         let loginID;
-        fetch("http://localhost:3000/loginimage", {
+        fetch("/loginimage", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })

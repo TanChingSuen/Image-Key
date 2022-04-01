@@ -82,7 +82,7 @@
           faceBtn.remove();
           const formdata = new FormData();
           formdata.append("registerface", face);
-          fetch("http://localhost:3000/registerface", {
+          fetch("/registerface", {
             method: "POST",
             body: formdata,
           })
@@ -90,7 +90,7 @@
             .then((data) => {
               if (data) {
                 alert("Register Success");
-                window.location.assign("http://localhost:3000/user");
+                window.location.assign("/user");
               } else {
                 canvasElement.remove();
                 alert(
@@ -104,7 +104,7 @@
       const form = document.querySelector(".key-image");
       form.addEventListener("submit", (e) => {
         let regID;
-        fetch("http://localhost:3000/registerimage", {
+        fetch("/registerimage", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })

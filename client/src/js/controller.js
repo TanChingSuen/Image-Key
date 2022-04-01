@@ -8,7 +8,7 @@ const pwTable = document.querySelector(".pwTable");
 if (homepage) {
   homepage.addEventListener("click", function (e) {
     e.preventDefault();
-    window.location.assign("http://localhost:3000");
+    window.location.assign("/");
   });
 }
 
@@ -33,7 +33,7 @@ if (addbtn) {
   fetch("http://localhost:3000/_id")
     .then((res) => res.json())
     .then((data) => {
-      iid = data[0].ID;
+      iid = data[0];
       const pwSet = data[1];
       pwSet.forEach((e, i) => {
         max = i;
@@ -106,6 +106,7 @@ if (addbtn) {
     const subtn = document.querySelector(".btn--submit");
     subtn.addEventListener("click", (e) => {
       e.preventDefault();
+      console.log(iid);
       const title = document.querySelector(".input--title").value;
       const pw = document.querySelector(".input--password").value;
       const uurl = document.querySelector(".input--url").value;

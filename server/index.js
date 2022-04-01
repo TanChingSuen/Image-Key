@@ -76,7 +76,6 @@ const registerFaceUpload = multer({ storage: registerFaceStorage });
 app
   .route("/loginimage")
   .post(loginUpload.single("image--key"), function (req, res, next) {
-    console.log(1);
     let id;
     app.locals.loginID = false;
     const data = fs.readFileSync(req.file.path, "base64");
@@ -231,7 +230,7 @@ app
             if (bestMatch.distance < 0.5) {
               a = 1;
               eventemitter.emit("logFace", a);
-              app.locals._ID = app.locals.loginID;
+              app.locals._ID = app.locals.loginID.ID;
               //connection.end();
             } else {
               a = null;
@@ -288,6 +287,7 @@ app
             connection.end();
             a = 1;
             app.locals._ID = app.locals.regID;
+            console.log(app.locals._ID);
           }
           eventemitter.emit("regFace", a);
         });
@@ -305,7 +305,7 @@ function mysqlConn() {
     host: "localhost",
     user: "root",
     password: null,
-    database: "test",
+    database: "imageKeyDB",
   });
   return connection;
 }
@@ -316,7 +316,7 @@ app.get("/_id", (req, res) => {
   const connection = mysqlConn();
   connection.connect();
   connection.query(
-    `SELECT Title,password,url FROM passwordtable WHERE ID = ${app.locals._ID.ID}`,
+    `SELECT Title,password,url FROM passwordtable WHERE ID = ${app.locals._ID}`,
     (err, res) => {
       if (err) throw err;
       data = res;
