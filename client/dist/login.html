@@ -83,7 +83,13 @@
           })
             .then((res) => res.json())
             .then((data) => {
-              if (data === 200) {
+              if (data === 3000) {
+                canvasElement.remove();
+                alert(
+                  "We detect more than one face in the picture.\nPlease take another picture and make sure you are the only person in the picture"
+                );
+                takeFacePic();
+              } else if (data === 200) {
                 canvasElement.remove();
                 alert(
                   "We are not able to detect your face from the picture you just took.\nPlease take another picture"

@@ -88,7 +88,13 @@
           })
             .then((res) => res.json())
             .then((data) => {
-              if (data) {
+              if (data === 3000) {
+                canvasElement.remove();
+                alert(
+                  "We detect more than one face in the picture.\nPlease take another picture and make sure you are the only person in the picture"
+                );
+                takeFacePic();
+              } else if (data) {
                 alert("Register Success");
                 window.location.assign("/user");
               } else {

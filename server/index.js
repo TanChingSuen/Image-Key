@@ -218,6 +218,10 @@ app
             .withFaceLandmarks()
             .withFaceDescriptors();
           if (facePicRes) {
+            if (facePicRes.length > 1) {
+              eventemitter.emit("logFace", 3000);
+              eventemitter.emit("emptyTemp");
+            }
             if (!facePicRes[0]) {
               eventemitter.emit("logFace", 200);
               eventemitter.emit("emptyTemp");
@@ -278,7 +282,9 @@ app
           .withFaceLandmarks()
           .withFaceDescriptors();
         eventemitter.once("checkRegFace", () => {
-          if (facePicRes[0]) {
+          if (facePicRes.length > 1) {
+            a = 3000;
+          } else if (facePicRes[0]) {
             const connection = mysqlConn();
             connection.connect();
             connection.query(
@@ -287,7 +293,6 @@ app
             connection.end();
             a = 1;
             app.locals._ID = app.locals.regID;
-            console.log(app.locals._ID);
           }
           eventemitter.emit("regFace", a);
         });
@@ -329,6 +334,7 @@ app.get("/_id", (req, res) => {
   });
 });
 
+//Add a password
 app.post("/add", (req, res) => {
   const connection = mysqlConn();
   connection.connect();
@@ -339,6 +345,7 @@ app.post("/add", (req, res) => {
   res.json(1);
 });
 
+//delete a password
 app.post("/delete", (req, res) => {
   console.log(req.body);
   const connection = mysqlConn();
