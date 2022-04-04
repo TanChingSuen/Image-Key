@@ -55,6 +55,7 @@ if (addbtn) {
           .addEventListener("click", function (ev) {
             ev.preventDefault();
             navigator.clipboard.writeText(e.password);
+            alert("Copy Complete");
           });
         document
           .querySelector(`.delete${i}`)

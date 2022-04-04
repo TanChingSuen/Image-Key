@@ -25,28 +25,30 @@
         <a class="homepage"> Image Key</a>
       </nav>
     </header>
-    <h1>Upload your Key Image here</h1>
-    <br />
-    <iframe
-      name="prevent--redirect"
-      id="prevent--redirect"
-      style="display: none"
-    ></iframe>
-    <form
-      target="prevent--redirect"
-      action="loginimage"
-      enctype="multipart/form-data"
-      method="post"
-      class="key-image"
-    >
-      <input type="file" name="image--key" accept="image/*" />
-      <input type="submit" class="submit--btn" />
-    </form>
-    <br />
-    <h1>
-      After finished processing your image, we will take a picture of you to
-      verify.
-    </h1>
+    <div class="non-face">
+      <h1>Upload your Key Image here</h1>
+      <br />
+      <iframe
+        name="prevent--redirect"
+        id="prevent--redirect"
+        style="display: none"
+      ></iframe>
+      <form
+        target="prevent--redirect"
+        action="loginimage"
+        enctype="multipart/form-data"
+        method="post"
+        class="key-image"
+      >
+        <input type="file" name="image--key" accept="image/*" />
+        <input type="submit" class="submit--btn" />
+      </form>
+      <br />
+      <h1>
+        After finished processing your image, we will take a picture of you to
+        verify.
+      </h1>
+    </div>
     <br class="br" />
     <script src="src/js/controller.js"></script>
     <script
@@ -57,13 +59,14 @@
       function takeFacePic() {
         const br = document.querySelector(".br");
         br.insertAdjacentHTML(
-          "afterend", //w640 h480
+          "afterend",
           `<div class="face">
             <video id="webcam" autoplay playsinline width="640" height="480"></video>
             <canvas id="canvas" class="d-none"></canvas>
             <button class="facePic">Take picture when you ready</button>
           </div>`
         );
+        document.querySelector(".non-face").remove();
         const webcamElement = document.getElementById("webcam");
         const canvasElement = document.getElementById("canvas");
         const faceBtn = document.querySelector(".facePic");

@@ -25,33 +25,35 @@
         <a class="homepage"> Image Key</a>
       </nav>
     </header>
-    <h1>Select and Upload your Key Image here</h1>
-    <br />
-    <h3>
-      Key Image is the image that you use for login, it can be image of
-      anything.
-    </h3>
-    <br />
-    <iframe
-      name="prevent--redirect"
-      id="prevent--redirect"
-      style="display: none"
-    ></iframe>
-    <form
-      target="prevent--redirect"
-      action="/registerimage"
-      enctype="multipart/form-data"
-      method="post"
-      class="key-image"
-    >
-      <input type="file" name="r--image--key" accept="image/*" />
-      <input type="submit" class="submit--btn" />
-    </form>
-    <br />
-    <h1>
-      After finished processing your image, we will take a picture of you to
-      verify.
-    </h1>
+    <div class="non-face">
+      <h1>Select and Upload your Key Image here</h1>
+      <br />
+      <h3>
+        Key Image is the image that you use for login, it can be image of
+        anything.
+      </h3>
+      <br />
+      <iframe
+        name="prevent--redirect"
+        id="prevent--redirect"
+        style="display: none"
+      ></iframe>
+      <form
+        target="prevent--redirect"
+        action="/registerimage"
+        enctype="multipart/form-data"
+        method="post"
+        class="key-image"
+      >
+        <input type="file" name="r--image--key" accept="image/*" />
+        <input type="submit" class="submit--btn" />
+      </form>
+      <br />
+      <h1>
+        After finished processing your image, we will take a picture of you to
+        verify.
+      </h1>
+    </div>
     <br class="br" />
     <script src="src/js/controller.js"></script>
     <script
@@ -69,6 +71,7 @@
             <button class="facePic">Take picture when you ready</button>
           </div>`
         );
+        document.querySelector(".non-face").remove();
         const webcamElement = document.getElementById("webcam");
         const canvasElement = document.getElementById("canvas");
         const faceBtn = document.querySelector(".facePic");
