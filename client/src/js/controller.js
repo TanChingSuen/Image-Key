@@ -109,6 +109,14 @@ if (addbtn) {
       const title = document.querySelector(".input--title").value;
       const pw = document.querySelector(".input--password").value;
       const uurl = document.querySelector(".input--url").value;
+      if (!title) {
+        alert("Title can't be empty");
+        return;
+      }
+      if (!pw) {
+        alert("Password can't be empty");
+        return;
+      }
       const pwitem = { iID: iid, Title: title, password: pw, url: uurl };
       fetch("http://localhost:3000/add", {
         headers: {
