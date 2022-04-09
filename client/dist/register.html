@@ -82,7 +82,9 @@
             <button class="facePic btn btn-primary">Take picture when you ready</button>
           </div>`
         );
-        document.querySelector(".non-face").remove();
+        if (document.querySelector(".non-face")) {
+          document.querySelector(".non-face").remove();
+        }
         const webcamElement = document.getElementById("webcam");
         const canvasElement = document.getElementById("canvas");
         const faceBtn = document.querySelector(".facePic");
