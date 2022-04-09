@@ -48,8 +48,8 @@ if (addbtn) {
           ehref = e.url;
         }
         c1.innerHTML = `<a ${e.url ? ehref : ""} >${e.Title}</a>`;
-        c2.innerHTML = `<button class='copy${i}' >Copy to Clipboard</button>
-        <button class='delete${i}' >Detele</button>`;
+        c2.innerHTML = `<button class='copy${i} btn btn-primary' >Copy to Clipboard</button>
+        <button class='delete${i} btn btn-danger' >Detele</button>`;
         document
           .querySelector(`.copy${i}`)
           .addEventListener("click", function (ev) {
@@ -70,7 +70,6 @@ if (addbtn) {
             const confirm = prompt(
               `Input "DELETE" to confirm this deletion\n Case Sensitive`
             );
-            console.log(confirm);
             if (confirm === "DELETE") {
               fetch("http://localhost:3000/delete", {
                 headers: {
@@ -107,7 +106,6 @@ if (addbtn) {
     const subtn = document.querySelector(".btn--submit");
     subtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log(iid);
       const title = document.querySelector(".input--title").value;
       const pw = document.querySelector(".input--password").value;
       const uurl = document.querySelector(".input--url").value;
@@ -134,8 +132,8 @@ if (addbtn) {
             ehref = `herf="${pwitem.url}"`;
           }
           c1.innerHTML = `<a ${pwitem.url ? ehref : null} >${pwitem.Title}</a>`;
-          c2.innerHTML = `<button class='copy${pt}' >Copy to Clipboard</button>
-        <button class='delete${pt}' >Detele</button>`;
+          c2.innerHTML = `<button class='copy${pt} btn btn-primary' >Copy to Clipboard</button>
+        <button class='delete${pt} btn btn-danger' >Detele</button>`;
           console.log(data);
           document
             .querySelector(`.copy${pt}`)
@@ -146,13 +144,37 @@ if (addbtn) {
           document
             .querySelector(`.delete${pt}`)
             .addEventListener("click", function (ev) {
+              const deleteitem = {
+                ID: iid,
+                Title: pwitem.Title,
+                password: pwitem.password,
+                url: pwitem.url,
+              };
               ev.preventDefault();
               const confirm = prompt(
                 `Input "DELETE" to confirm this deletion\n Case Sensitive`
               );
-              console.log(confirm);
+              if (confirm === "DELETE") {
+                fetch("http://localhost:3000/delete", {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  method: "POST",
+                  body: JSON.stringify(deleteitem),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    console.log(data);
+                    row.remove();
+                  });
+              } else {
+                alert("Input Incorrect, deletion canceled");
+              }
             });
         });
+      title = "";
+      pw = "";
+      uurl = "";
     });
   });
 }
