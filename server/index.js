@@ -15,6 +15,7 @@ global.atob = require("atob");
 global.Blob = require("node-blob");
 const EventEmitter = require("events");
 const eventemitter = new EventEmitter();
+const session = require("express-session");
 const faceapi = require("@vladmandic/face-api");
 const canvas = require("canvas");
 const tf = require("@tensorflow/tfjs-node");
@@ -325,11 +326,11 @@ app.get("/_id", (req, res) => {
     (err, res) => {
       if (err) throw err;
       data = res;
-      eventemitter.emit("sendData");
+      return eventemitter.emit("sendData");
     }
   );
 
-  eventemitter.on("sendData", () => {
+  eventemitter.once("sendData", () => {
     res.json([app.locals._ID, data]);
   });
 });
@@ -360,6 +361,12 @@ app.post("/delete", (req, res) => {
 //Password Page
 app.get("/user", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/user.html"));
+});
+
+app.get("/logout", function (req, res, next) {
+  req.session = null;
+  res.redirect("/");
+  next();
 });
 
 //Homepage
