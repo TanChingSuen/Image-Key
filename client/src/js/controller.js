@@ -201,7 +201,7 @@ if (addbtn) {
         }
         c1.innerHTML = `<a ${e.url ? ehref : ""} >${e.Title}</a>`;
         c2.innerHTML = `<button class='copy${i} btn btn-primary' >Copy to Clipboard</button>
-        <button class='delete${i} btn btn-danger' >Detele</button>`;
+        <button class='delete${i} btn btn-danger' >Delete</button>`;
         document
           .querySelector(`.copy${i}`)
           .addEventListener("click", function (ev) {
@@ -248,94 +248,96 @@ if (addbtn) {
       e.preventDefault();
       document.querySelector(".addModal").style.opacity = 0;
     });
-    const randompw = document.querySelector(".btn--randompw");
-    randompw.addEventListener("click", (e) => {
-      e.preventDefault();
-      const pw = document.querySelector(".input--password");
-      pw.value = randomPassword();
-    });
-    //Start over here
-    const subtn = document.querySelector(".btn--submit");
-    subtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const title = document.querySelector(".input--title").value;
-      const pw = document.querySelector(".input--password").value;
-      const uurl = document.querySelector(".input--url").value;
-      if (!title) {
-        alert("Title can't be empty");
-        return;
-      }
-      if (!pw) {
-        alert("Password can't be empty");
-        return;
-      }
-      const pwitem = { iID: iid, Title: title, password: pw, url: uurl };
-      fetch("http://localhost:3000/add", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POSt",
-        body: JSON.stringify(pwitem),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          const pt = max + 1;
-          document.querySelector(".addModal").style.opacity = 0;
-          const row = pwTable.insertRow(-1);
-          const c1 = row.insertCell(0);
-          const c2 = row.insertCell(1);
-          const httpsPre = "https://";
-          let ehref;
-          if (!pwitem.url?.includes("https://")) {
-            ehref = `href="${httpsPre + pwitem.url}"`;
-          } else {
-            ehref = `herf="${pwitem.url}"`;
-          }
-          c1.innerHTML = `<a ${pwitem.url ? ehref : null} >${pwitem.Title}</a>`;
-          c2.innerHTML = `<button class='copy${pt} btn btn-primary' >Copy to Clipboard</button>
-        <button class='delete${pt} btn btn-danger' >Detele</button>`;
-          console.log(data);
-          document
-            .querySelector(`.copy${pt}`)
-            .addEventListener("click", function (ev) {
-              ev.preventDefault();
-              navigator.clipboard.writeText(pwitem.password);
-            });
-          document
-            .querySelector(`.delete${pt}`)
-            .addEventListener("click", function (ev) {
-              const deleteitem = {
-                ID: iid,
-                Title: pwitem.Title,
-                password: pwitem.password,
-                url: pwitem.url,
-              };
-              ev.preventDefault();
-              const confirm = prompt(
-                `Input "DELETE" to confirm this deletion\n Case Sensitive`
-              );
-              if (confirm === "DELETE") {
-                fetch("http://localhost:3000/delete", {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  method: "POST",
-                  body: JSON.stringify(deleteitem),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    console.log(data);
-                    row.remove();
-                  });
-              } else {
-                alert("Input Incorrect, deletion canceled");
-              }
-            });
-        });
-      title = "";
-      pw = "";
-      uurl = "";
-    });
+  });
+  const randompw = document.querySelector(".btn--randompw");
+  randompw.addEventListener("click", (e) => {
+    e.preventDefault();
+    const pw = document.querySelector(".input--password");
+    pw.value = randomPassword();
+  });
+  //Start over here
+  const subtn = document.querySelector(".btn--submit");
+  subtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const title = document.querySelector(".input--title").value;
+    const pw = document.querySelector(".input--password").value;
+    const uurl = document.querySelector(".input--url").value;
+    if (!title) {
+      alert("Title can't be empty");
+      return;
+    }
+    if (!pw) {
+      alert("Password can't be empty");
+      return;
+    }
+    const pwitem = { iID: iid, Title: title, password: pw, url: uurl };
+    fetch("http://localhost:3000/add", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POSt",
+      body: JSON.stringify(pwitem),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        max++;
+        let pt = max;
+        document.querySelector(".addModal").style.opacity = 0;
+        const row = pwTable.insertRow(-1);
+        const c1 = row.insertCell(0);
+        const c2 = row.insertCell(1);
+        const httpsPre = "https://";
+        let ehref;
+        if (!pwitem.url?.includes("https://")) {
+          ehref = `href="${httpsPre + pwitem.url}"`;
+        } else {
+          ehref = `herf="${pwitem.url}"`;
+        }
+        c1.innerHTML = `<a ${pwitem.url ? ehref : null} >${pwitem.Title}</a>`;
+        c2.innerHTML = `<button class='copy${pt} btn btn-primary' >Copy to Clipboard</button>
+        <button class='delete${pt} btn btn-danger' >Delete</button>`;
+        console.log(data);
+        document
+          .querySelector(`.copy${pt}`)
+          .addEventListener("click", function (ev) {
+            ev.preventDefault();
+            navigator.clipboard.writeText(pwitem.password);
+            alert("Copy Complete");
+          });
+        document
+          .querySelector(`.delete${pt}`)
+          .addEventListener("click", function (ev) {
+            const deleteitem = {
+              ID: iid,
+              Title: pwitem.Title,
+              password: pwitem.password,
+              url: pwitem.url,
+            };
+            ev.preventDefault();
+            const confirm = prompt(
+              `Input "DELETE" to confirm this deletion\n Case Sensitive`
+            );
+            if (confirm === "DELETE") {
+              fetch("http://localhost:3000/delete", {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify(deleteitem),
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  console.log(data);
+                  row.remove();
+                });
+            } else {
+              alert("Input Incorrect, deletion canceled");
+            }
+          });
+      });
+    document.querySelector(".input--title").value = "";
+    document.querySelector(".input--password").value = "";
+    document.querySelector(".input--url").value = "";
   });
 }
 

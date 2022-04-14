@@ -342,7 +342,7 @@ app.post("/add", (req, res) => {
     `INSERT INTO passwordtable (ID, Title, password, url) VALUES (${req.body.iID} , '${req.body.Title}' , '${req.body.password}' , '${req.body.url}')`
   );
   connection.end();
-  res.json(1);
+  return res.json(1);
 });
 
 //delete a password
