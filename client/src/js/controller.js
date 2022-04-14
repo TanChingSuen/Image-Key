@@ -7,28 +7,6 @@ const pwTable = document.querySelector(".pwTable");
 const loginPage = document.querySelector(".login-it");
 const registerPage = document.querySelector(".register-it");
 
-if (homepage) {
-  homepage.addEventListener("click", function (e) {
-    e.preventDefault();
-    window.location.assign("/");
-  });
-}
-
-if (login) {
-  login.addEventListener("click", function (e) {
-    e.preventDefault();
-    window.history.pushState(null, "", "/login");
-    location.reload();
-  });
-}
-if (register) {
-  register.addEventListener("click", function (e) {
-    e.preventDefault();
-    window.history.pushState(null, "", "/register");
-    location.reload();
-  });
-}
-
 if (loginPage) {
   function takeFacePic() {
     const br = document.querySelector(".br");

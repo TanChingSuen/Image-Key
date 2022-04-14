@@ -318,19 +318,20 @@ function mysqlConn() {
 
 //Send the EVERYTHING in use
 app.get("/_id", (req, res) => {
-  let data;
-  const connection = mysqlConn();
-  connection.connect();
-  connection.query(
-    `SELECT Title,password,url FROM passwordtable WHERE ID = ${app.locals._ID}`,
-    (err, res) => {
-      if (err) throw err;
-      data = res;
-      return eventemitter.emit("sendData");
-    }
-  );
+  if (app.locals._ID) {
+    let data;
+    const connection = mysqlConn();
+    connection.connect();
+    connection.query(
+      `SELECT Title,password,url FROM passwordtable WHERE ID = ${app.locals._ID}`,
+      (err, res) => {
+        if (err) throw err;
+        eventemitter.emit("sendData", res);
+      }
+    );
+  }
 
-  eventemitter.once("sendData", () => {
+  eventemitter.once("sendData", (data) => {
     res.json([app.locals._ID, data]);
   });
 });
@@ -361,10 +362,13 @@ app.post("/delete", (req, res) => {
 //Password Page
 app.get("/user", function (req, res) {
   res.sendFile(path.join(__dirname, "../client/dist/user.html"));
+  if (!app.locals._ID) {
+    res.redirect("/");
+  }
 });
 
 app.get("/logout", function (req, res, next) {
-  req.session = null;
+  app.locals._ID = null;
   res.redirect("/");
   next();
 });
