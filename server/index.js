@@ -168,6 +168,8 @@ app
   .post(loginFaceUpload.single("login--face"), function (req, res, next) {
     const facedata = req.body.loginface.split(",")[1];
     const b64face = Buffer.from(facedata, "base64");
+    const iid = app.locals.loginID.ID;
+    app.locals.loginID.ID = null;
     jimp.read(b64face, (err, res) => {
       if (err) throw err;
       res.quality(100).write("temp/facePic.png");
@@ -177,7 +179,7 @@ app
     const connection = mysqlConn();
     connection.connect();
     connection.query(
-      `SELECT faceImage FROM keyimageandface WHERE ID = ${app.locals.loginID.ID}`,
+      `SELECT faceImage FROM keyimageandface WHERE ID = ${iid}`,
       (err, res) => {
         if (err) throw err;
         temp = res;
@@ -235,11 +237,9 @@ app
             if (bestMatch.distance < 0.5) {
               a = 1;
               eventemitter.emit("logFace", a);
-              app.locals._ID = app.locals.loginID.ID;
-              //connection.end();
+              app.locals._ID = iid;
             } else {
               a = null;
-              //connection.end();
               eventemitter.emit("logFace", a);
             }
           }
@@ -261,6 +261,8 @@ eventemitter.on("emptyTemp", () => {
 app
   .route("/registerface")
   .post(registerFaceUpload.single("register--face"), function (req, res, next) {
+    const iid = app.locals.regID;
+    app.locals.regID = null;
     const storingData = req.body.registerface.split(",")[1];
     const model_path = path.join(__dirname, "../models");
     let a = null;
@@ -289,11 +291,11 @@ app
             const connection = mysqlConn();
             connection.connect();
             connection.query(
-              `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${app.locals.regID}`
+              `UPDATE keyimageandface SET faceImage = '${storingData}' WHERE ID = ${iid}`
             );
             connection.end();
             a = 1;
-            app.locals._ID = app.locals.regID;
+            app.locals._ID = iid;
           }
           eventemitter.emit("regFace", a);
         });
