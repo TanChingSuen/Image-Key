@@ -224,10 +224,12 @@ app
             if (facePicRes.length > 1) {
               eventemitter.emit("logFace", 3000);
               eventemitter.emit("emptyTemp");
+              app.locals.loginID.ID = iid;
             }
             if (!facePicRes[0]) {
               eventemitter.emit("logFace", 200);
               eventemitter.emit("emptyTemp");
+              app.locals.loginID.ID = iid;
               //connection.end();
               return;
             }
@@ -241,6 +243,7 @@ app
             } else {
               a = null;
               eventemitter.emit("logFace", a);
+              app.locals.loginID.ID = iid;
             }
           }
 
@@ -287,6 +290,7 @@ app
         eventemitter.once("checkRegFace", () => {
           if (facePicRes.length > 1) {
             a = 3000;
+            app.locals.regID = iid;
           } else if (facePicRes[0]) {
             const connection = mysqlConn();
             connection.connect();
@@ -296,6 +300,8 @@ app
             connection.end();
             a = 1;
             app.locals._ID = iid;
+          } else {
+            app.locals.regID = iid;
           }
           eventemitter.emit("regFace", a);
         });
