@@ -164,6 +164,7 @@ if (addbtn) {
     .then((res) => res.json())
     .then((data) => {
       iid = data[0];
+      console.log(iid);
       const pwSet = data[1];
       pwSet.forEach((e, i) => {
         max = i;

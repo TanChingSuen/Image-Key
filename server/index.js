@@ -83,6 +83,7 @@ app
     const connection = mysqlConn();
     connection.connect();
     //Insert a account of fake ID of 9(10) with the input picture
+    /*
     connection.query(
       `INSERT INTO keyimageandface (ID , keyImage) VALUES (2147483646 , '${data}')`
     );
@@ -97,7 +98,15 @@ app
     );
 
     //Delete 9(10) and its picture data
-    connection.query(`DELETE FROM keyimageandface WHERE ID = 2147483646`);
+    connection.query(`DELETE FROM keyimageandface WHERE ID = 2147483646`);*/
+    connection.query(
+      `SELECT ID FROM keyimageandface WHERE keyImage = '${data}'`,
+      (err, res) => {
+        if (err) throw err;
+        app.locals.loginID = res[0] ? res[0] : 0;
+        eventemitter.emit("loginImage");
+      }
+    );
     connection.end();
     next();
   })
@@ -342,7 +351,7 @@ app.get("/_id", (req, res) => {
   }
 
   eventemitter.once("sendData", (data) => {
-    res.json([app.locals._ID, data]);
+    res.json([res.locals._ID, data]);
   });
 });
 
