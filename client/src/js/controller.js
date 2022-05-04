@@ -7,6 +7,8 @@ const pwTable = document.querySelector(".pwTable");
 const loginPage = document.querySelector(".login-it");
 const registerPage = document.querySelector(".register-it");
 
+//Final Version
+
 if (loginPage) {
   function takeFacePic() {
     const br = document.querySelector(".br");

@@ -22,6 +22,8 @@ const tf = require("@tensorflow/tfjs-node");
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
+//Final Version
+
 //Static file so I can use src from client file
 app.use(express.static(__dirname + "/../client"));
 app.use(express.static(__dirname + "../node_modules"));
@@ -82,23 +84,6 @@ app
     const data = fs.readFileSync(req.file.path, "base64");
     const connection = mysqlConn();
     connection.connect();
-    //Insert a account of fake ID of 9(10) with the input picture
-    /*
-    connection.query(
-      `INSERT INTO keyimageandface (ID , keyImage) VALUES (2147483646 , '${data}')`
-    );
-    //Select ID with Picture of 9(10)
-    connection.query(
-      `SELECT ID FROM keyimageandface WHERE ID != 2147483646 and keyImage = (SELECT keyImage FROM keyimageandface WHERE ID = 2147483646)`,
-      (err, res) => {
-        if (err) throw err;
-        app.locals.loginID = res[0] ? res[0] : 0;
-        eventemitter.emit("loginImage");
-      }
-    );
-
-    //Delete 9(10) and its picture data
-    connection.query(`DELETE FROM keyimageandface WHERE ID = 2147483646`);*/
     connection.query(
       `SELECT ID FROM keyimageandface WHERE keyImage = '${data}'`,
       (err, res) => {
