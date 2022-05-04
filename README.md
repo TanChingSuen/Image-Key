@@ -1,6 +1,6 @@
 # Image-Key
 Install Nodejs
-Install Git
+\nInstall Git
 Install vs code
 Install Python and must add python to environment variable. Prefer custom installation. 
 Install Tensorflow or just use the following command on the command prompt
