@@ -1,5 +1,6 @@
 # Image-Key
 Install Nodejs ,Git,vs code
+
 Install Python and must add python to environment variable. Prefer custom installation. 
 Install Tensorflow or just use the following command on the command prompt
 pip3 install --user --upgrade tensorflow
